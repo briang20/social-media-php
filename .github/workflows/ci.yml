@@ -28,10 +28,9 @@ jobs:
         with:
           pull: true
           load: true
-          workdir: api
           files: |
-            compose.yaml
-            compose.override.yaml
+            api/compose.yaml
+            api/compose.override.yaml
           set: |
             *.cache-from=type=gha,scope=${{github.ref}}
             *.cache-from=type=gha,scope=refs/heads/main
