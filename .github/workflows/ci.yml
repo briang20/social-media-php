@@ -28,42 +28,51 @@ jobs:
         with:
           pull: true
           load: true
+          workdir: api
           files: |
-            api/compose.yaml
-            api/compose.override.yaml
+            compose.yaml
+            compose.override.yaml
           set: |
             *.cache-from=type=gha,scope=${{github.ref}}
             *.cache-from=type=gha,scope=refs/heads/main
             *.cache-to=type=gha,scope=${{github.ref}},mode=max
       -
         name: Start services
-        run: docker compose -f api/compose.yaml -f api/compose.override.yaml up --wait --no-build
+        run: docker compose -f compose.yaml -f compose.override.yaml up --wait --no-build
+        working-directory: api
       -
         name: Check HTTP reachability
         run: curl -v --fail-with-body http://localhost
+        working-directory: api
       -
         name: Check HTTPS reachability
         if: false # Remove this line when the homepage will be configured, or change the path to check
         run: curl -vk --fail-with-body https://localhost
+        working-directory: api
       -
         name: Check Mercure reachability
         run: curl -vkI --fail-with-body https://localhost/.well-known/mercure?topic=test
+        working-directory: api
       -
         name: Create test database
         if: false # Remove this line if Doctrine ORM is installed
-        run: docker compose -f api/compose.yaml -f api/compose.override.yaml exec -T php bin/console -e test doctrine:database:create
+        run: docker compose -f compose.yaml -f compose.override.yaml exec -T php bin/console -e test doctrine:database:create
+        working-directory: api
       -
         name: Run migrations
         if: false # Remove this line if Doctrine Migrations is installed
-        run: docker compose -f api/compose.yaml -f api/compose.override.yaml exec -T php bin/console -e test doctrine:migrations:migrate --no-interaction
+        run: docker compose -f compose.yaml -f compose.override.yaml exec -T php bin/console -e test doctrine:migrations:migrate --no-interaction
+        working-directory: api
       -
         name: Run PHPUnit
         if: false # Remove this line if PHPUnit is installed
-        run: docker compose -f api/compose.yaml -f api/compose.override.yaml exec -T php bin/phpunit
+        run: docker compose -f compose.yaml -f compose.override.yaml exec -T php bin/phpunit
+        working-directory: api
       -
         name: Doctrine Schema Validator
         if: false # Remove this line if Doctrine ORM is installed
-        run: docker compose -f api/compose.yaml -f api/compose.override.yaml exec -T php bin/console -e test doctrine:schema:validate
+        run: docker compose -f compose.yaml -f compose.override.yaml exec -T php bin/console -e test doctrine:schema:validate
+        working-directory: api
   lint:
     name: Docker Lint
     runs-on: ubuntu-latest
